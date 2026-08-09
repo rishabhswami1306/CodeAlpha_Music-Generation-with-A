@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Music AI - Classical LSTM Generator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    <div class="app-container">
+        
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-compact-disc fa-spin logo-icon"></i>
+                <div class="logo-text">
+                    <h1>Deep Music AI</h1>
+                    <p>Classical LSTM Music Generator</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <span class="status-indicator" id="global-status-indicator"></span>
+                <span id="global-status-text">Checking environment...</span>
+            </div>
+        </header>
+
+        <!-- DASHBOARD GRID -->
+        <main class="dashboard-grid">
+            
+            <!-- LEFT COLUMN: CONTROLS -->
+            <section class="control-column">
+                
+                <!-- CARD 1: PREPROCESSING -->
+                <div class="glass-card" id="preprocess-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-database card-icon text-cyan"></i>
+                        <h2>1. Data Preprocessing</h2>
+                    </div>
+                    <div class="card-content">
+                        <p class="description">Downloads classical MIDI scores (Mozart) or generates a synthetic MIDI set if offline, then parses notes/chords into training sequences.</p>
+                        
+                        <div class="status-bar">
+                            <span class="status-label">Dataset:</span>
+                            <span class="status-badge" id="data-status-badge">Checking...</span>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="btn-preprocess">
+                            <i class="fa-solid fa-gears btn-icon"></i> Run Preprocessing
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 2: TRAINING -->
+                <div class="glass-card" id="training-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-brain card-icon text-purple"></i>
+                        <h2>2. Model Training</h2>
+                    </div>
+                    <div class="card-content">
+                        <p class="description">Trains the dual LSTM network on preprocessed notes. For testing, choose 1-5 epochs. For rich melodies, train for 30+ epochs.</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="input-epochs">Epochs</label>
+                                <input type="number" id="input-epochs" min="1" max="200" value="20">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-batch-size">Batch Size</label>
+                                <input type="number" id="input-batch-size" min="8" max="512" value="64">
+                            </div>
+                        </div>
+
+                        <div class="status-bar">
+                            <span class="status-label">Model Checkpoint:</span>
+                            <span class="status-badge" id="model-status-badge">Checking...</span>
+                        </div>
+
+                        <!-- Progress Section -->
+                        <div class="progress-container hidden" id="training-progress-container">
+                            <div class="progress-info">
+                                <span id="progress-epoch">Epoch 0 / 0</span>
+                                <span id="progress-loss">Loss: --</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="training-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-stats">
+                                <span id="progress-accuracy">Accuracy: --</span>
+                                <span class="pulse-text" id="progress-status-detail">Training...</span>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" id="btn-train">
+                                <i class="fa-solid fa-play btn-icon"></i> Start Training
+                            </button>
+                            <button class="btn btn-danger hidden" id="btn-stop-train">
+                                <i class="fa-solid fa-stop btn-icon"></i> Stop Training
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 3: GENERATION -->
+                <div class="glass-card" id="generation-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-wand-magic-sparkles card-icon text-pink"></i>
+                        <h2>3. Music Generation</h2>
+                    </div>
+                    <div class="card-content">
+                        <p class="description">Generates a new melody from a random seed using temperature sampling, then synthesizes it into a playable `.wav` file.</p>
+                        
+                        <div class="slider-group">
+                            <div class="slider-label-row">
+                                <label for="slider-temp">Creativity (Temp): <span id="val-temp" class="val-highlight">0.7</span></label>
+                                <span class="slider-tip" id="temp-tip">Balanced</span>
+                            </div>
+                            <input type="range" id="slider-temp" min="0.1" max="1.5" step="0.05" value="0.7">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-label-row">
+                                <label for="slider-notes">Melody Length: <span id="val-notes" class="val-highlight">100</span> notes</label>
+                            </div>
+                            <input type="range" id="slider-notes" min="20" max="400" step="10" value="100">
+                        </div>
+
+                        <button class="btn btn-success" id="btn-generate">
+                            <i class="fa-solid fa-music btn-icon"></i> Generate Music
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- RIGHT COLUMN: OUTPUTS & VISUALS -->
+            <section class="output-column">
+                
+                <!-- CARD 4: PLAYER & VISUALIZER -->
+                <div class="glass-card player-card" id="player-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-volume-high card-icon text-green"></i>
+                        <h2>Generated Composition</h2>
+                    </div>
+                    <div class="card-content player-content">
+                        <!-- Visualizer Area -->
+                        <div class="visualizer-container">
+                            <canvas id="visualizer-canvas"></canvas>
+                            <div class="visualizer-overlay" id="visualizer-idle-overlay">
+                                <i class="fa-solid fa-music play-symbol-large"></i>
+                                <p>Ready to Play</p>
+                            </div>
+                        </div>
+
+                        <!-- Audio Player -->
+                        <div class="audio-player-wrapper">
+                            <audio id="audio-element" src="/api/play"></audio>
+                            
+                            <!-- Custom Player UI -->
+                            <div class="custom-player">
+                                <button class="player-btn" id="player-btn-play" disabled>
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                
+                                <div class="player-timeline-wrapper">
+                                    <span class="time-stamp" id="player-current-time">0:00</span>
+                                    <input type="range" class="player-timeline" id="player-timeline" min="0" max="100" value="0" disabled>
+                                    <span class="time-stamp" id="player-total-time">0:00</span>
+                                </div>
+                                
+                                <div class="volume-wrapper">
+                                    <i class="fa-solid fa-volume-low text-dim" id="volume-icon"></i>
+                                    <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.7">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Downloads & Actions -->
+                        <div class="export-actions">
+                            <a href="/api/download/midi" class="btn btn-secondary download-link disabled" id="link-download-midi">
+                                <i class="fa-solid fa-file-midi btn-icon"></i> Download MIDI
+                            </a>
+                            <a href="/api/download/wav" class="btn btn-secondary download-link disabled" id="link-download-wav">
+                                <i class="fa-solid fa-file-audio btn-icon"></i> Download WAV
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 5: LIVE LOGS -->
+                <div class="glass-card logs-card" id="logs-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-terminal card-icon text-orange"></i>
+                        <h2>System Logs</h2>
+                        <div class="log-actions">
+                            <span class="log-tag" id="log-active-tag">Idle</span>
+                        </div>
+                    </div>
+                    <div class="card-content console-content">
+                        <pre class="console-output" id="console-output">System initialized... Select an action above to start the pipeline.</pre>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+        
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <p>Developed with <i class="fa-solid fa-heart text-pink"></i> in Windows Environment. Powered by TensorFlow, Keras & music21.</p>
+        </footer>
+    </div>
+
+    <!-- Script -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

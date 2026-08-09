@@ -1,0 +1,6 @@
+tensorflow>=2.15.0
+music21>=9.1.0
+numpy>=1.23.5
+scipy>=1.10.0
+pretty_midi>=0.2.10
+Flask>=3.0.0
