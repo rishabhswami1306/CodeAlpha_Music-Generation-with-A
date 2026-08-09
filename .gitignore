@@ -1,0 +1,22 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache & compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Logs & Temporary Data
+*.log
+data/preprocess.log
+data/train.log
+data/training_status.json
+
+# Operating System Files
+.DS_Store
+Thumbs.db

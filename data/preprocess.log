@@ -1,4 +1,32 @@
-Traceback (most recent call last):
-  File "C:\Users\Diya\Desktop\New folder\preprocess.py", line 6, in <module>
-    from music21 import converter, note, chord, stream, meter, tempo, key, instrument
-ModuleNotFoundError: No module named 'music21'
+--- STEP 1: Data Collection ---
+Attempting to download classical MIDI dataset from http://www.piano-midi.de/zip/mozart.zip...
+Warning: Could not download MIDI dataset (HTTP Error 418: I'm a teapot).
+Falling back to programmatically generating a synthetic MIDI dataset for training...
+Synthetic MIDI dataset generated successfully.
+
+--- STEP 2: Preprocessing ---
+Found 20 MIDI files to parse.
+Parsing file 1/20: synthetic_song_0.mid
+Parsing file 2/20: synthetic_song_1.mid
+Parsing file 3/20: synthetic_song_10.mid
+Parsing file 4/20: synthetic_song_11.mid
+Parsing file 5/20: synthetic_song_12.mid
+Parsing file 6/20: synthetic_song_13.mid
+Parsing file 7/20: synthetic_song_14.mid
+Parsing file 8/20: synthetic_song_15.mid
+Parsing file 9/20: synthetic_song_16.mid
+Parsing file 10/20: synthetic_song_17.mid
+Parsing file 11/20: synthetic_song_18.mid
+Parsing file 12/20: synthetic_song_19.mid
+Parsing file 13/20: synthetic_song_2.mid
+Parsing file 14/20: synthetic_song_3.mid
+Parsing file 15/20: synthetic_song_4.mid
+Parsing file 16/20: synthetic_song_5.mid
+Parsing file 17/20: synthetic_song_6.mid
+Parsing file 18/20: synthetic_song_7.mid
+Parsing file 19/20: synthetic_song_8.mid
+Parsing file 20/20: synthetic_song_9.mid
+Parsed total of 1000 note/chord elements.
+Vocabulary size (unique notes/chords): 28
+Total training sequences generated: 950
+Preprocessing completed. Structured datasets saved to 'data/preprocessed_data.pkl'.

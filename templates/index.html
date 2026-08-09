@@ -118,6 +118,24 @@
                     <div class="card-content">
                         <p class="description">Generates a new melody from a random seed using temperature sampling, then synthesizes it into a playable `.wav` file.</p>
                         
+                        <div class="form-group margin-bottom-sm">
+                            <label for="select-tone-style" style="display:block; margin-bottom:6px; font-weight:500; font-size:0.9rem; color:var(--color-text-main);">
+                                <i class="fa-solid fa-palette text-pink"></i> Tone Timbre Shade (48kHz HD)
+                            </label>
+                            <select id="select-tone-style" class="form-select" style="width:100%; padding:10px; border-radius:10px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); color:#fff; font-family:var(--font-primary); font-size:0.95rem;">
+                                <option value="piano" selected>🎹 Concert Grand Piano (Steinway Model D 48kHz HD)</option>
+                                <option value="harpsichord">🎼 Baroque Harpsichord (French 1770 Two-Manual)</option>
+                                <option value="celesta">🔔 Celesta & Music Box (Tchaikovsky Crystal Bell)</option>
+                                <option value="felt">🌫️ Ambient Felt Piano (Muted Satie Warmth)</option>
+                                <option value="strings">🎻 Orchestral Strings (Stradivarius Quartet Vibrato)</option>
+                                <option value="organ">🎺 Cathedral Pipe Organ (Massive 16'/8'/4'/2' Stops)</option>
+                                <option value="woodwinds">🎷 Classical Woodwinds (Flute & Oboe Breathy Trio)</option>
+                                <option value="guitar">🎸 Nylon Classical Guitar (Acoustic Pluck & Resonance)</option>
+                                <option value="synth">🌌 Cosmic Analog Synth Pad (Dual Detuned LFO Sweep)</option>
+                                <option value="chiptune">⚡ 8-Bit Retro Chiptune (Vintage NES Pulse Wave)</option>
+                            </select>
+                        </div>
+
                         <div class="slider-group">
                             <div class="slider-label-row">
                                 <label for="slider-temp">Creativity (Temp): <span id="val-temp" class="val-highlight">0.7</span></label>

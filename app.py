@@ -11,6 +11,17 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 preprocess_process = None
 train_process = None
 
+def get_python_executable():
+    """Returns path to workspace virtual environment python if available, else sys.executable."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    venv_py_win = os.path.join(base_dir, "venv", "Scripts", "python.exe")
+    venv_py_nix = os.path.join(base_dir, "venv", "bin", "python")
+    if os.path.exists(venv_py_win):
+        return venv_py_win
+    elif os.path.exists(venv_py_nix):
+        return venv_py_nix
+    return sys.executable
+
 def get_log_tail(filepath, lines_count=50):
     """Utility to get the last N lines of a log file."""
     if not os.path.exists(filepath):
@@ -87,8 +98,9 @@ def run_preprocess():
             
     # Launch preprocess.py
     try:
+        py_exe = get_python_executable()
         preprocess_process = subprocess.Popen(
-            [sys.executable, "preprocess.py"],
+            [py_exe, "preprocess.py"],
             stdout=open("data/preprocess.log", "w", encoding='utf-8'),
             stderr=subprocess.STDOUT,
             text=True
@@ -155,8 +167,9 @@ def run_train():
         
     # Launch train.py
     try:
+        py_exe = get_python_executable()
         train_process = subprocess.Popen(
-            [sys.executable, "train.py", "--epochs", str(epochs), "--batch_size", str(batch_size)],
+            [py_exe, "train.py", "--epochs", str(epochs), "--batch_size", str(batch_size)],
             stdout=open("data/train.log", "w", encoding='utf-8'),
             stderr=subprocess.STDOUT,
             text=True
@@ -239,24 +252,24 @@ def run_generate():
     data = request.json or {}
     notes = data.get('notes', 100)
     temp = data.get('temp', 0.7)
+    tone = data.get('tone', 'piano')
     model = data.get('model', 'models/best_model.h5')
     
     # Check if preprocessed data exists
-    if not os.path.exists("data/preprocessed_data.pkl"):
-        return jsonify({"status": "error", "message": "Preprocessed data not found. Run preprocessing first."}), 400
+    if not os.path.exists("data/preprocessed_data.pkl") and not os.path.exists("data/raw_notes.pkl"):
+        return jsonify({"status": "error", "message": "Data not found. Run preprocessing first."}), 400
         
-    # Check if model exists
-    if not os.path.exists(model):
-        # Check if fallback model exists
-        if os.path.exists("models/final_music_model.h5"):
-            model = "models/final_music_model.h5"
-        else:
-            return jsonify({"status": "error", "message": "No trained model found. Please train a model first."}), 400
-            
     # Run generate.py as a subprocess to capture stdout/stderr easily and run it inside the correct env
     try:
+        py_exe = get_python_executable()
+        cmd = [py_exe, "generate.py", "--notes", str(notes), "--temp", str(temp), "--tone", str(tone)]
+        if os.path.exists(model):
+            cmd.extend(["--model", model])
+        elif os.path.exists("models/final_music_model.h5"):
+            cmd.extend(["--model", "models/final_music_model.h5"])
+            
         proc = subprocess.Popen(
-            [sys.executable, "generate.py", "--model", model, "--notes", str(notes), "--temp", str(temp)],
+            cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True

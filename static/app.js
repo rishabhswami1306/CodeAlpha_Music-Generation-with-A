@@ -364,16 +364,18 @@ function scrollLogsToBottom() {
 async function generateMusic() {
     const notes = parseInt(sliderNotes.value) || 100;
     const temp = parseFloat(sliderTemp.value) || 0.7;
+    const toneSelect = document.getElementById('select-tone-style');
+    const tone = toneSelect ? toneSelect.value : 'piano';
     
     try {
         logActiveTag.textContent = "Generation";
-        consoleOutput.textContent = `Generating new piano performance...\nNotes: ${notes}\nTemperature: ${temp}\n\nRunning generator models...`;
+        consoleOutput.textContent = `Generating new classical performance...\nNotes: ${notes}\nTemperature: ${temp}\nTone Timbre: ${tone.toUpperCase()}\n\nRunning generator models...`;
         btnGenerate.setAttribute('disabled', 'true');
         
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ notes, temp })
+            body: JSON.stringify({ notes, temp, tone })
         });
         const data = await response.json();
         

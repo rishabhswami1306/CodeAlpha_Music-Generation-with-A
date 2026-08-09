@@ -1,14 +1,23 @@
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import (
-    LSTM, Dropout, Dense, Embedding, Input, 
-    RepeatVector, TimeDistributed, Bidirectional
-)
+try:
+    from tensorflow.keras.models import Sequential, Model
+    from tensorflow.keras.layers import (
+        LSTM, Dropout, Dense, Embedding, Input, 
+        RepeatVector, TimeDistributed, Bidirectional
+    )
+except ModuleNotFoundError:
+    Sequential = Model = LSTM = Dropout = Dense = Embedding = Input = RepeatVector = TimeDistributed = Bidirectional = None
 
 def create_lstm_model(vocab_size, sequence_length, use_embedding=True):
     """
     Builds and compiles an LSTM-based sequence model in TensorFlow/Keras.
     Can be configured to use either a token embedding layer or direct raw sequence input.
     """
+    if Sequential is None:
+        raise ImportError(
+            "TensorFlow is not installed in the active Python environment.\n"
+            "TensorFlow requires Python 3.9-3.12. Please run: \\.venv\\Scripts\\python.exe train.py "
+            "using a Python 3.12 virtual environment with tensorflow installed."
+        )
     model = Sequential()
     
     if use_embedding:

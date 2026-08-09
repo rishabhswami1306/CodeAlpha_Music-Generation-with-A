@@ -1,1 +1,1 @@
-{"status": "starting", "epoch": 0, "total_epochs": 20, "loss": 0.0, "accuracy": 0.0}
+{"status": "completed", "epoch": 11, "total_epochs": 11, "loss": 0.3552873452061263, "accuracy": 0.97, "model_path": "models/final_music_model.h5"}

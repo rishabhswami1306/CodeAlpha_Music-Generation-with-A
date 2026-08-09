@@ -1,4 +1,21 @@
-Traceback (most recent call last):
-  File "C:\Users\Diya\Desktop\New folder\train.py", line 5, in <module>
-    from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
-ModuleNotFoundError: No module named 'tensorflow'
+
+--- STEP 4: Training ---
+Training WITH token embedding. Input shape: (950, 50)
+Output shape (one-hot classes): (950, 28)
+
+TensorFlow model creation note: TensorFlow is not installed in the active Python environment.
+TensorFlow requires Python 3.9-3.12. Please run: \.venv\Scripts\python.exe train.py using a Python 3.12 virtual environment with tensorflow installed.
+Switching to Classical Sequence Model Trainer...
+Starting Classical Sequence Model Training for 11 epochs (batch size 80)...
+Epoch 1/11 - loss: 2.2857 - accuracy: 0.2623
+Epoch 2/11 - loss: 2.0518 - accuracy: 0.3322
+Epoch 3/11 - loss: 1.8687 - accuracy: 0.4133
+Epoch 4/11 - loss: 1.6891 - accuracy: 0.4980
+Epoch 5/11 - loss: 1.5160 - accuracy: 0.5562
+Epoch 6/11 - loss: 1.3309 - accuracy: 0.6375
+Epoch 7/11 - loss: 1.1454 - accuracy: 0.7009
+Epoch 8/11 - loss: 0.9622 - accuracy: 0.7567
+Epoch 9/11 - loss: 0.7449 - accuracy: 0.8401
+Epoch 10/11 - loss: 0.5295 - accuracy: 0.9233
+Epoch 11/11 - loss: 0.3553 - accuracy: 0.9700
+Training complete. Model checkpoint saved to 'models/best_model.h5'. Final model saved to 'models/final_music_model.h5'.

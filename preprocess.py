@@ -40,39 +40,74 @@ def download_midi_dataset(dest_dir="data/midi"):
         create_synthetic_midi(dest_dir, num_files=20)
         print("Synthetic MIDI dataset generated successfully.")
 
-def create_synthetic_midi(output_dir, num_files=20):
+def create_synthetic_midi(output_dir, num_files=25):
     """
-    Generates synthetic MIDI files representing simple scales and chords.
-    Used as a robust offline fallback to ensure training code works in any environment.
+    Generates rich, expressive classical piano MIDI files featuring famous classical
+    progressions (Pachelbel Canon, Mozart Allegro, Bach Prelude, Chopin Nocturne, Beethoven motifs).
     """
+    os.makedirs(output_dir, exist_ok=True)
+    
+    classical_themes = [
+        # Theme 1: Pachelbel Canon Harmony (D Major / C Major transpose)
+        {
+            'key': 'C', 'tempo': 84,
+            'chords': [['C4','E4','G4'], ['G3','B3','D4'], ['A3','C4','E4'], ['E3','G3','B3'], ['F3','A3','C4'], ['C3','E3','G3'], ['F3','A3','C4'], ['G3','B3','D4']],
+            'melody': ['C5','B4','A4','G4','F4','E4','F4','D4','E4','G4','C5','E5','D5','C5','B4','C5']
+        },
+        # Theme 2: Mozart K.545 Sonata Allegro (Bright & Joyful)
+        {
+            'key': 'C', 'tempo': 124,
+            'chords': [['C4','E4','G4'], ['G3','B3','D4','F4'], ['C4','E4','G4'], ['F3','A3','C4'], ['G3','B3','D4'], ['C4','E4','G4']],
+            'melody': ['C5','E5','G5','B4','C5','D5','C5','G4','E4','C4','F4','A4','C5','B4','A4','G4']
+        },
+        # Theme 3: Für Elise Motifs (Emotional Classical Minor)
+        {
+            'key': 'A', 'tempo': 96,
+            'chords': [['A3','C4','E4'], ['E3','G#3','B3'], ['A3','C4','E4'], ['C4','E4','G4'], ['G3','B3','D4'], ['A3','C4','E4']],
+            'melody': ['E5','D#5','E5','D#5','E5','B4','D5','C5','A4','C4','E4','A4','B4','E4','G#4','B4','C5']
+        },
+        # Theme 4: Chopin Nocturne Warm & Romantic
+        {
+            'key': 'G', 'tempo': 76,
+            'chords': [['G3','B3','D4'], ['E3','G3','B3'], ['C4','E4','G4'], ['D3','F#3','A3','C4']],
+            'melody': ['D5','B5','A5','G5','E5','D5','C5','B4','A4','B4','D5','G5','F#5','E5','D5']
+        },
+        # Theme 5: Bach Harmonic Prelude Arpeggios
+        {
+            'key': 'C', 'tempo': 92,
+            'chords': [['C3','E4','G4','C5'], ['C3','D4','F4','A4'], ['B2','D4','G4','D5'], ['C3','E4','G4','C5']],
+            'melody': ['C4','E4','G4','C5','E5','G4','C5','E5','C4','D4','F4','A4','D5','F4','A4','D5']
+        }
+    ]
+
     for i in range(num_files):
+        theme = classical_themes[i % len(classical_themes)]
         s = stream.Stream()
-        s.append(tempo.MetronomeMark(number=120))
+        s.append(tempo.MetronomeMark(number=theme['tempo']))
         s.append(meter.TimeSignature('4/4'))
-        s.append(key.Key('C'))
-        
-        # Simple melodic patterns and chords in C Major
-        notes_pool = ['C4', 'E4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5']
-        chords_pool = [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5']]
+        s.append(key.Key(theme['key']))
         
         offset = 0.0
-        # Write 40 notes/chords per song
-        for step in range(40):
+        chords = theme['chords']
+        melody = theme['melody']
+        
+        # Build 48 musical steps per song (chords + melodic embellishments)
+        for step in range(48):
             if step % 4 == 0:
-                c_notes = chords_pool[(step // 4) % len(chords_pool)]
+                c_notes = chords[(step // 4) % len(chords)]
                 c = chord.Chord(c_notes)
                 c.duration.quarterLength = 1.0
                 c.offset = offset
                 s.append(c)
                 offset += 1.0
             else:
-                n = note.Note(notes_pool[step % len(notes_pool)])
+                m_note = melody[step % len(melody)]
+                n = note.Note(m_note)
                 n.duration.quarterLength = 0.5
                 n.offset = offset
                 s.append(n)
                 offset += 0.5
                 
-        # Write instrument part
         p = instrument.Piano()
         s.insert(0, p)
         
@@ -107,8 +142,11 @@ def parse_midi_files(data_dir):
             midi = converter.parse(file_path)
             
             # Flatten to extract notes and chords
-            # To handle files with multiple instruments, recurse and find notes/chords
-            notes_to_parse = midi.flat.notes
+            # Compatible with both music21 v10+ (flatten()) and older versions (.flat)
+            if hasattr(midi, 'flatten'):
+                notes_to_parse = midi.flatten().notes
+            else:
+                notes_to_parse = midi.flat.notes
             
             for element in notes_to_parse:
                 # Get offset relative to the start of the score
@@ -169,8 +207,11 @@ def prepare_sequences(notes, sequence_length=50):
     X_normalized = X_normalized / float(vocab_size)
     
     # One-hot encode outputs
-    from tensorflow.keras.utils import to_categorical
-    y = to_categorical(network_output, num_classes=vocab_size)
+    try:
+        from tensorflow.keras.utils import to_categorical
+        y = to_categorical(network_output, num_classes=vocab_size)
+    except ModuleNotFoundError:
+        y = np.eye(vocab_size)[network_output]
     
     return X, X_normalized, y, note_to_int, int_to_note, vocab_size
 
